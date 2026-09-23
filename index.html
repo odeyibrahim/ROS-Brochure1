@@ -184,9 +184,9 @@ fi.onchange=()=>{
   const f=fi.files[0],t=cur;fi.value='';if(!f||!t||!t.classList.contains('img'))return;
   const lg=t.classList.contains('logo'),r=new FileReader();
   r.onload=()=>{const i=new Image();i.onload=()=>{
-    const k=Math.min(1,2400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;
-    c.getContext('2d').drawImage(i,0,0,c.width,c.height);
-    t.style.backgroundImage='url('+(lg?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.92))+')';t.classList.add('has')};i.src=r.result};r.readAsDataURL(f)};
+    const k=Math.min(1,3600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;
+    const cx=c.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(i,0,0,c.width,c.height);
+    t.style.backgroundImage='url('+(lg?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.97))+')';t.classList.add('has')};i.src=r.result};r.readAsDataURL(f)};
 
 /* fit to screen */
 const fit=()=>{$('#stage').style.zoom=Math.min(1,(innerWidth-16)/794)};
@@ -195,7 +195,7 @@ addEventListener('resize',fit);fit();
 /* export */
 const msg=s=>st.textContent=s;
 async function ready(){sel(null);document.activeElement&&document.activeElement.blur();scrollTo(0,0);document.body.classList.add('exp');$('#stage').style.zoom=1;await document.fonts.ready}
-const shot=p=>html2canvas(p,{scale:2,backgroundColor:'#fff',ignoreElements:e=>e.classList&&e.classList.contains('noexp')});
+const shot=p=>html2canvas(p,{scale:3,backgroundColor:'#fff',ignoreElements:e=>e.classList&&e.classList.contains('noexp')});
 const blobOf=(c,t,q)=>new Promise(r=>c.toBlob(r,t,q));
 function inl(o,c){const s=getComputedStyle(o);let t='';for(const k of s){if(k[0]==='-'||/^(animation|transition|scroll|view)/.test(k))continue;t+=k+':'+s.getPropertyValue(k)+';'}c.setAttribute('style',t);c.removeAttribute('contenteditable');[...o.children].forEach((x,i)=>inl(x,c.children[i]))}
 function svgOf(p){const c=p.cloneNode(true);inl(p,c);$$('.noexp',c).forEach(n=>n.remove());
@@ -210,11 +210,11 @@ async function run(kind){
     await ready();const P=$$('.pg');
     if(kind==='pdf'){
       msg('Rendering PDF…');const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
-      for(let i=0;i<P.length;i++){const c=await shot(P[i]);if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,210,297)}
+      for(let i=0;i<P.length;i++){const c=await shot(P[i]);if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.97),'JPEG',0,0,210,297)}
       await save(NAME+'.pdf',pdf.output('blob'));
     }else for(let i=0;i<P.length;i++){
       msg('Page '+(i+1)+'…');
-      const b=kind==='jpg'?await blobOf(await shot(P[i]),'image/jpeg',.94):new Blob([svgOf(P[i])],{type:'image/svg+xml'});
+      const b=kind==='jpg'?await blobOf(await shot(P[i]),'image/jpeg',.97):new Blob([svgOf(P[i])],{type:'image/svg+xml'});
       await save(NAME+'-page-'+(i+1)+'.'+kind,b);
     }
     msg('Done');
