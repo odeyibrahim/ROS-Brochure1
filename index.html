@@ -57,6 +57,7 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
 .tab [data-r=brand]{color:#fff;text-shadow:0 2px 10px #00000080}
 .tab [data-r=sub]{color:#f3dfb0;text-shadow:0 1px 6px #00000080}
 .tab .logo{width:64px;height:64px}
+.logo.nobg{background-color:transparent;box-shadow:none;padding:0;border-radius:0}
 .blk{position:absolute;left:48px;top:250px;width:330px;height:216px;background:var(--navy);padding:26px 28px;z-index:2}
 .rule{display:block;width:30px;height:1.5px;background:var(--gold);margin-bottom:14px}
 .loc{display:flex;align-items:center;gap:8px}.loc .ic{width:16px;height:16px}
@@ -79,6 +80,17 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
 .cols .it{margin-bottom:15px}
 .cta{position:absolute;left:0;right:0;bottom:0;height:150px;background:var(--navy);border-top:3px solid var(--gold);padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
 .cr{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #ffffff26}.cr:last-child{border:0}
+/* vector PDF via the browser's print engine: text stays text, images stay full-resolution */
+@media print{
+@page{size:A4;margin:0}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+:root{padding:0}html,body{background:#fff!important;min-height:0}
+.tb,.noexp{display:none!important}
+.stage{padding:0!important;zoom:1!important;display:block}
+.pg{width:210mm;height:1122px;margin:0!important;box-shadow:none!important;break-after:page}
+.pg:last-child{break-after:auto}
+.t,.img,.sel{outline:none!important}
+}
 </style>
 </head>
 <body>
@@ -94,7 +106,7 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
   </span>
   <span class="grp" id="gi" hidden>
     <button id="up">Replace image</button><button id="rm">Remove</button>
-    <span id="gilg" hidden><label>Logo size <input type="range" id="lsz" min="28" max="160" step="1"></label></span>
+    <span id="gilg" hidden><label>Logo size <input type="range" id="lsz" min="28" max="160" step="1"></label><label title="Untick for a transparent logo background"><input type="checkbox" id="lgbg" checked> White backing</label></span>
     <span id="gifoc"><label>Focus X <input type="range" id="px" min="0" max="100"></label>
     <label>Y <input type="range" id="py" min="0" max="100"></label></span>
   </span>
@@ -105,7 +117,8 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
   </span>
   <span class="sp2"></span>
   <span id="st"></span>
-  <button class="pri" id="bp">Export PDF</button><button id="bj">JPEG</button><button id="bs">SVG</button>
+  <button id="bsv" title="Edits also autosave in this browser">Save</button><button id="brs" title="Discard saved edits and restore the original layout">Reset</button>
+  <button class="pri" id="bp" title="Opens the print dialog: choose 'Save as PDF', Margins: None, Background graphics: on. Text stays vector, images stay full resolution.">Export PDF</button><button id="bpi" title="Fallback: rasterised PDF">PDF (image)</button><button id="bj">JPEG</button><button id="bs">SVG</button>
 </div>
 <input type="file" id="fi" accept="image/*" hidden>
 <div class="stage" id="stage"></div>
@@ -129,7 +142,7 @@ const specs=[['plan','Footprint','466 sqm single-level lateral layout'],['floor'
 const feat=[['sofa','Generous lateral living area','466 sqm of fluid, high-ceiling indoor living and entertainment zones designed for seamless hosting.'],['bed','5 residential bedrooms','4 primary en-suite bedrooms plus a versatile 5th bedroom or multi-purpose space, ideal for a private gym or guest room, with an adjacent box room pre-plumbed for en-suite conversion.'],['desk','Dedicated executive home office','A completely isolated workspace engineered for private working and corporate connectivity without sacrificing bedroom capacity.'],['door','Dual staff quarters','2 integrated en-suite domestic staff quarters (BQ) with independent service access.'],['chef',"Chef's kitchen",'Fully fitted, state-of-the-art kitchen featuring modern cabinetry and premium integrated appliances.'],['gem','Bespoke architectural finishes','Premium imported marble, granite and quartz tile finishes throughout the main living corridors.']];
 const smart=[['auto','Home automation','Fully integrated smart-home technology infrastructure governing lighting, climate and security access.'],['lift','Vertical mobility','Dual high-speed resident elevators complemented by a dedicated service elevator.'],['bolt','Uninterrupted utilities','24-hour guaranteed captive power generation, centralized water treatment and dedicated sewage treatment infrastructure.']];
 const amen=[['arch','Grand entrance','Exquisite entrance lobby featuring a contemporary resident lounge area.'],['gym','Wellness and recreation','Fully equipped fitness center, resort-style swimming pool and private games/billiards room.'],['tree','Landscaping and parking','Professionally landscaped grounds within a fully gated, perimeter-secured compound featuring 3 dedicated covered parking spaces.'],['shield','Comprehensive security','24-hour manned physical security, gated entry control, perimeter fencing and integrated CCTV surveillance.']];
-$('#stage').innerHTML=`
+const tpl=()=>`
 <section class="pg" id="p1">${IMG('g0 bleed','height:330px')}
  <div class="tab">${lock()}</div>
  <div class="blk">${T('kick','Executive 5-bedroom residence & home office')}${T('h1','Refined lateral luxury in the heart of Old Ikoyi')}<i class="rule"></i><div class="loc">${IC('pin')}${T('dtag','Lugard Avenue, Old Ikoyi, Lagos')}</div></div>
@@ -147,9 +160,21 @@ $('#stage').innerHTML=`
   <div><div class="cr">${IC('phone')}${T('db','Phone / WhatsApp: +234 (0) XX XXXX XXXX')}</div><div class="cr">${IC('mail')}${T('db','info@yourfirm.com')}</div><div class="cr">${IC('globe')}${T('db','www.yourfirm.com')}</div></div></div>
 </section>`;
 
+/* persistence: autosaves to this browser's IndexedDB (private to you, not shared) */
+const msg=s=>st.textContent=s;
+const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open('avenue-brochure',1);r.onupgradeneeded=()=>r.result.createObjectStore('s');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+const tx=async(m,f)=>{const d=await idb();return new Promise((ok,no)=>{const q=f(d.transaction('s',m).objectStore('s'));q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})};
+const dbGet=()=>tx('readonly',s=>s.get('doc')),dbSet=v=>tx('readwrite',s=>s.put(v,'doc')),dbDel=()=>tx('readwrite',s=>s.delete('doc'));
+const snap=()=>{const c=$('#stage').cloneNode(true);$$('.sel',c).forEach(n=>n.classList.remove('sel'));return{v:1,html:c.innerHTML,pal:{navy:cnavy.value,gold:cgold.value,paper:cpaper.value}}};
+let tm;
+const later=()=>{msg('Unsaved…');clearTimeout(tm);tm=setTimeout(persist,800)};
+async function persist(){clearTimeout(tm);try{await dbSet(snap());msg('Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))}catch(e){msg('Saving unavailable here')}}
+addEventListener('pagehide',()=>{if(tm)persist()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&tm)persist()});
+
 /* editing */
 const CE=(()=>{const d=document.createElement('div');d.contentEditable='plaintext-only';return d.contentEditable==='plaintext-only'?'plaintext-only':'true'})();
-$$('.t').forEach(n=>{n.contentEditable=CE;n.spellcheck=false});
+const wire=()=>$$('.t').forEach(n=>{n.contentEditable=CE;n.spellcheck=false});
 document.addEventListener('paste',e=>{if(e.target.closest&&e.target.closest('.t')){e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))}});
 const hex=c=>'#'+c.match(/\d+/g).slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
 let cur=null;
@@ -159,7 +184,7 @@ function sel(e){
   e.classList.add('sel');const im=e.classList.contains('img');gt.hidden=im;gi.hidden=!im;const isLogo=e.classList.contains('logo');who.textContent=im?(isLogo?'Logo':'Image'):'Text';
   if(im){
     gilg.hidden=!isLogo;gifoc.hidden=isLogo;
-    if(isLogo){const w=parseFloat(getComputedStyle(e).width);lsz.value=Math.round(w)}
+    if(isLogo){const w=parseFloat(getComputedStyle(e).width);lsz.value=Math.round(w);lgbg.checked=!e.classList.contains('nobg')}
     else{const p=(e.style.backgroundPosition||'50% 50%').split(' ');px.value=parseFloat(p[0]);py.value=parseFloat(p[1])}
   }
   else{const s=getComputedStyle(e),f=s.fontFamily.split(',')[0].replace(/['"]/g,'').trim();fs.value=Math.round(parseFloat(s.fontSize)*2)/2;fc.value=hex(s.color);fw.value=s.fontWeight;ff.value=[...ff.options].some(o=>o.value===f||o.text===f)?f:''}
@@ -169,31 +194,38 @@ document.addEventListener('dblclick',e=>{const t=e.target.closest('.img');if(t){
 const ap=(p,v)=>{if(!cur)return;(all.checked&&cur.dataset.r?$$('[data-r="'+cur.dataset.r+'"]'):[cur]).forEach(n=>n.style[p]=v)};
 ff.onchange=()=>ff.value&&ap('fontFamily',STACK[ff.value]||`'${ff.value}',sans-serif`);
 const setVar=(k,v)=>document.documentElement.style.setProperty(k,v);
-cnavy.oninput=()=>setVar('--navy',cnavy.value);
-cgold.oninput=()=>setVar('--gold',cgold.value);
-cpaper.oninput=()=>setVar('--paper',cpaper.value);
+const pv=(k,el)=>el.oninput=()=>{setVar(k,el.value);later()};
+pv('--navy',cnavy);pv('--gold',cgold);pv('--paper',cpaper);
 fs.oninput=()=>fs.value&&ap('fontSize',fs.value+'px');
 fc.oninput=()=>ap('color',fc.value);
 $$('.sw').forEach(s=>s.onclick=()=>{fc.value=s.dataset.c;ap('color',s.dataset.c)});
 fw.onchange=()=>ap('fontWeight',fw.value);
 up.onclick=()=>fi.click();
-rm.onclick=()=>{if(cur){cur.style.backgroundImage='';cur.classList.remove('has')}};
+rm.onclick=()=>{if(!cur)return;const lg=cur.classList.contains('logo');(lg?$$('.logo'):[cur]).forEach(n=>{n.style.backgroundImage='';n.classList.remove('has');lg&&n.classList.remove('nobg')});if(lg)lgbg.checked=true;later()};
 px.oninput=py.oninput=()=>{if(cur)cur.style.backgroundPosition=px.value+'% '+py.value+'%'};
 lsz.oninput=()=>{if(cur){cur.style.width=cur.style.height=lsz.value+'px'}};
+lgbg.onchange=()=>{$$('.logo').forEach(l=>l.classList.toggle('nobg',!lgbg.checked));later()};
 fi.onchange=()=>{
   const f=fi.files[0],t=cur;fi.value='';if(!f||!t||!t.classList.contains('img'))return;
   const lg=t.classList.contains('logo'),r=new FileReader();
   r.onload=()=>{const i=new Image();i.onload=()=>{
-    const k=Math.min(1,3600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;
-    const cx=c.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(i,0,0,c.width,c.height);
-    t.style.backgroundImage='url('+(lg?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.97))+')';t.classList.add('has')};i.src=r.result};r.readAsDataURL(f)};
+    const k=Math.min(1,(lg?1600:3600)/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);
+    const cx=c.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';
+    if(!lg){cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height)}
+    cx.drawImage(i,0,0,c.width,c.height);
+    if(lg){
+      /* logos keep their alpha (PNG); a transparent logo automatically drops the white backing, and applies to every logo in the brochure */
+      let a=false;try{const d=cx.getImageData(0,0,c.width,c.height).data;for(let p=3;p<d.length;p+=16)if(d[p]<250){a=true;break}}catch(e){}
+      const u='url('+c.toDataURL('image/png')+')';
+      $$('.logo').forEach(l=>{l.style.backgroundImage=u;l.classList.add('has');l.classList.toggle('nobg',a)});lgbg.checked=!a;
+    }else{t.style.backgroundImage='url('+c.toDataURL('image/jpeg',.97)+')';t.classList.add('has')}
+    later()};i.src=r.result};r.readAsDataURL(f)};
 
 /* fit to screen */
 const fit=()=>{$('#stage').style.zoom=Math.min(1,(innerWidth-16)/794)};
 addEventListener('resize',fit);fit();
 
 /* export */
-const msg=s=>st.textContent=s;
 async function ready(){sel(null);document.activeElement&&document.activeElement.blur();scrollTo(0,0);document.body.classList.add('exp');$('#stage').style.zoom=1;await document.fonts.ready}
 const shot=p=>html2canvas(p,{scale:3,backgroundColor:'#fff',ignoreElements:e=>e.classList&&e.classList.contains('noexp')});
 const blobOf=(c,t,q)=>new Promise(r=>c.toBlob(r,t,q));
@@ -221,7 +253,32 @@ async function run(kind){
   }catch(e){msg(e&&e.code==='declined'?'Save cancelled':'Export failed: '+((e&&(e.code||e.message))||e))}
   finally{document.body.classList.remove('exp');fit()}
 }
-bp.onclick=()=>run('pdf');bj.onclick=()=>run('jpg');bs.onclick=()=>run('svg');
+/* vector PDF: print dialog -> "Save as PDF" (Margins: None, Background graphics on) */
+bp.onclick=async()=>{sel(null);document.activeElement&&document.activeElement.blur();await document.fonts.ready;msg('Choose “Save as PDF”');try{window.print()}catch(e){msg('Print blocked here – use PDF (image)')}};
+bpi.onclick=()=>run('pdf');bj.onclick=()=>run('jpg');bs.onclick=()=>run('svg');
+bsv.onclick=persist;
+let rc=0;
+brs.onclick=async()=>{
+  if(!rc){brs.textContent='Sure? Click again';rc=setTimeout(()=>{rc=0;brs.textContent='Reset'},3000);return}
+  clearTimeout(rc);rc=0;brs.textContent='Reset';sel(null);
+  try{await dbDel()}catch(e){}
+  $('#stage').innerHTML=tpl();wire();
+  [['--navy',cnavy,'#0f1f3d'],['--gold',cgold,'#b08d4a'],['--paper',cpaper,'#ffffff']].forEach(([k,el,v])=>{el.value=v;setVar(k,v)});
+  clearTimeout(tm);tm=0;msg('Reset to original');
+};
+
+/* boot: restore saved edits if any, then watch for changes */
+(async function boot(){
+  let s=null;try{s=await dbGet()}catch(e){}
+  const stg=$('#stage');
+  if(s&&s.html){
+    stg.innerHTML=s.html;
+    if(s.pal)[['--navy',cnavy,s.pal.navy],['--gold',cgold,s.pal.gold],['--paper',cpaper,s.pal.paper]].forEach(([k,el,v])=>{if(v){el.value=v;setVar(k,v)}});
+  }else stg.innerHTML=tpl();
+  wire();
+  new MutationObserver(r=>{if(r.some(x=>x.target!==stg))later()}).observe(stg,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['style']});
+  msg(s&&s.html?'Restored your saved edits':'');
+})();
 </script>
 </body>
 </html>
