@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Avenue Residences – Brochure Editor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200..800&family=Jost:wght@300;400;500&family=DM+Sans:wght@300;400;500;700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#e4e7ea;--bar:#fff;--fg:#0f1f3d;--ln:#cdd2d8;--navy:#0f1f3d;--gold:#b08d4a;--paper:#ffffff;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111519;--bar:#1c2228;--fg:#e8ebee;--ln:#39424b}}
+:root[data-theme="dark"]{--bg:#111519;--bar:#1c2228;--fg:#e8ebee;--ln:#39424b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,sans-serif;min-height:100vh}
+.tb{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bar);border-bottom:1px solid var(--ln);padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font:12px system-ui,sans-serif}
+.grp{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}.grp[hidden]{display:none}
+.tb select,.tb input[type=number],.tb button{font:inherit;padding:5px 8px;border:1px solid var(--ln);border-radius:6px;background:transparent;color:var(--fg)}
+.tb input[type=number]{width:58px}.tb input[type=color]{width:34px;height:28px;padding:0;border:1px solid var(--ln);border-radius:6px;background:none}
+.tb button{cursor:pointer}.tb .pri{background:#0f1f3d;color:#fff;border-color:#b08d4a}
+.sw{width:18px;height:18px;border-radius:50%;border:1px solid var(--ln);cursor:pointer;display:inline-block}
+.tb .sp2{flex:1}#st{color:#7d8789;min-width:90px}
+.stage{padding:24px 8px 8px;display:flex;flex-direction:column;align-items:center}
+.pg{width:794px;height:1123px;flex:none;background:var(--paper);color:var(--navy);position:relative;overflow:hidden;margin:0 auto 28px;box-shadow:0 2px 20px #0003;font-family:'Hanken Grotesk',sans-serif}
+.exp .pg{box-shadow:none;margin:0}
+.t{outline:none;min-height:1em;cursor:text;white-space:pre-wrap}
+.t:hover{outline:1px dashed #b08d4aaa;outline-offset:3px}
+.sel{outline:2px solid #2f7dd1!important;outline-offset:3px}
+.exp .t,.exp .img{outline:none!important}
+.img{position:relative;cursor:pointer;background-size:cover;background-position:50% 50%;background-repeat:no-repeat;border-radius:8px}
+.bleed{border-radius:0}
+.g0{background-image:linear-gradient(135deg,#1c2f52,#4a6284)}.g1{background-image:linear-gradient(160deg,#d3cab8,#988b73)}.g2{background-image:linear-gradient(120deg,#8497b0,#34486a)}
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:12px system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px #0006;pointer-events:none}
+.has .ph{display:none}
+.logo{width:42px;height:42px;flex:none;background-color:#fff;border-radius:8px;background-size:62% auto;background-repeat:no-repeat;background-position:50% 50%;box-shadow:0 0 0 1px #0000000d;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23B08D4A' stroke-width='1.6'%3E%3Crect x='1' y='1' width='38' height='38'/%3E%3Cpath d='M11 30L20 9l9 21M14.5 23h11'/%3E%3C/svg%3E")}
+.lock{display:flex;align-items:center;gap:12px}
+.ic{width:22px;height:22px;flex:none}
+[data-r=brand]{font-size:13px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;line-height:1.3}
+[data-r=sub]{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+[data-r=kick]{font-size:8.5px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);line-height:1.6}
+[data-r=h1]{font-size:26px;font-weight:300;line-height:1.16;letter-spacing:-.01em;color:#fff;margin:10px 0 14px}
+[data-r=dtag]{font-size:10.5px;color:#e9edf3;letter-spacing:.04em}
+[data-r=stat]{font-size:66px;font-weight:200;line-height:.85;letter-spacing:-.035em}
+[data-r=price]{font-size:27px;font-weight:300;letter-spacing:-.01em;margin:4px 0 2px}
+[data-r=note]{font-size:10.5px;color:#5b6577}
+[data-r=body]{font-size:11px;line-height:1.75;color:#4b5566}
+[data-r=k]{font-size:8px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#94743a;margin-bottom:3px}
+[data-r=v]{font-size:11.5px;line-height:1.4}
+[data-r=h2]{font-size:20px;font-weight:300;letter-spacing:-.01em;line-height:1.2}
+[data-r=ih]{font-size:11.5px;font-weight:600;margin-bottom:3px}
+[data-r=ib]{font-size:10px;line-height:1.6;color:#56606f}
+[data-r=ch]{font-size:22px;font-weight:300;line-height:1.2;color:#fff;margin-top:8px}
+[data-r=dh]{font-size:18px;font-weight:300;line-height:1.25;color:#fff;margin:14px 0 6px}
+[data-r=db]{font-size:10.5px;line-height:1.75;color:#c9d1de}
+[data-r=pn]{position:absolute;left:48px;bottom:24px;font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:#8a93a3}
+.dk [data-r=brand]{color:#fff}.dk [data-r=sub],.blk [data-r=kick],.call [data-r=kick]{color:#d2b57a}
+.tab{position:absolute;left:0;top:0;padding:20px 32px 20px 48px}
+.tab [data-r=brand]{color:#fff;text-shadow:0 2px 10px #00000080}
+.tab [data-r=sub]{color:#f3dfb0;text-shadow:0 1px 6px #00000080}
+.tab .logo{width:64px;height:64px;background-size:74% auto}
+.blk{position:absolute;left:48px;top:250px;width:330px;height:216px;background:var(--navy);padding:26px 28px;z-index:2}
+.rule{display:block;width:30px;height:1.5px;background:var(--gold);margin-bottom:14px}
+.loc{display:flex;align-items:center;gap:8px}.loc .ic{width:16px;height:16px}
+.pd{padding:96px 48px 0}
+.hd{display:grid;grid-template-columns:330px 1fr;gap:38px}
+.pr{margin-top:126px;border-top:1px solid #b08d4a;padding-top:14px;height:fit-content}
+.sr{display:flex;align-items:flex-end;gap:14px;margin-bottom:16px}.sr [data-r=kick]{width:170px}
+.sp{display:grid;grid-template-columns:repeat(4,1fr);margin-top:22px;border-top:2px solid var(--navy);border-bottom:1px solid #e4ddcc}
+.sp>div{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:12px 10px 12px 14px;align-items:start}
+.sp>div:nth-child(4n+1){padding-left:0}.sp>div:not(:nth-child(4n+1)){border-left:1px solid #e4ddcc}.sp>div:nth-child(n+5){border-top:1px solid #e4ddcc}
+.sec{margin-top:20px}
+.sh{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:9px;border-bottom:1px solid #e4ddcc}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 38px;margin-top:14px}
+.it{display:grid;grid-template-columns:22px 1fr;gap:11px;align-items:start}.it+.it{margin-top:0}
+.bar{height:62px;padding:0 48px;display:flex;align-items:center;justify-content:space-between}
+.col3{display:grid;grid-template-columns:1.55fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:340px}.col3 .img:first-child{grid-row:span 2}
+.call{position:relative;margin:-44px 48px 0 130px;background:var(--navy);padding:26px 30px;display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;align-items:start}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:38px;margin:34px 48px 0}
+.sh2{border-top:2px solid var(--navy);padding-top:10px;margin-bottom:16px}
+.cols .it{margin-bottom:15px}
+.cta{position:absolute;left:0;right:0;bottom:0;height:150px;background:var(--navy);border-top:3px solid var(--gold);padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.cr{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #ffffff26}.cr:last-child{border:0}
+</style>
+</head>
+<body>
+<div class="tb" id="tb">
+  <b id="who">Click any text or photo</b>
+  <span class="grp" id="gt" hidden>
+    <select id="ff" title="Font"><option value="">Font…</option><option>Hanken Grotesk</option><option>Jost</option><option>DM Sans</option><option>Avenir Next</option><option>Instrument Sans</option><option>Instrument Serif</option><option>Arial</option><option>Verdana</option><option>Georgia</option></select>
+    <input type="number" id="fs" min="6" max="140" step="0.5" title="Size (px)">
+    <input type="color" id="fc" title="Colour">
+    <i class="sw" data-c="#0f1f3d" style="background:#0f1f3d" title="Navy"></i><i class="sw" data-c="#b08d4a" style="background:#b08d4a" title="Gold"></i><i class="sw" data-c="#ffffff" style="background:#fff" title="White"></i>
+    <select id="fw" title="Weight"><option value="200">Extra light</option><option value="300">Light</option><option value="400">Regular</option><option value="500">Medium</option><option value="600">Semibold</option><option value="700">Bold</option></select>
+    <label><input type="checkbox" id="all"> all of this type</label>
+  </span>
+  <span class="grp" id="gi" hidden>
+    <button id="up">Replace image</button><button id="rm">Remove</button>
+    <label>Focus X <input type="range" id="px" min="0" max="100"></label>
+    <label>Y <input type="range" id="py" min="0" max="100"></label>
+  </span>
+  <span class="grp" id="gd" title="Page palette — applies to all pages">
+    <label>Navy <input type="color" id="cnavy" value="#0f1f3d"></label>
+    <label>Gold <input type="color" id="cgold" value="#b08d4a"></label>
+    <label>Paper <input type="color" id="cpaper" value="#ffffff"></label>
+  </span>
+  <span class="sp2"></span>
+  <span id="st"></span>
+  <button class="pri" id="bp">Export PDF</button><button id="bj">JPEG</button><button id="bs">SVG</button>
+</div>
+<input type="file" id="fi" accept="image/*" hidden>
+<div class="stage" id="stage"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const FONTS='https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200..800&family=Jost:wght@300;400;500&family=DM+Sans:wght@300;400;500;700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap';
+const STACK={'Avenir Next':"'Avenir Next','Avenir','Century Gothic',sans-serif",'Instrument Serif':"'Instrument Serif',Georgia,serif",'Instrument Sans':"'Instrument Sans',sans-serif"};
+const NAME='The-Avenue-Residences';
+const ICON={plan:'<path d="M3 3h18v18H3zM3 9h6M9 3v6M21 15h-8M13 21v-8"/>',building:'<path d="M5 21V4h9v17M14 9h5v12M3 21h18M8 8h3M8 12h3M8 16h3"/>',bed:'<path d="M3 18V6M3 14h18v4M21 14v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="1.5"/>',desk:'<path d="M5 6h14v9H5zM2 19h20"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',doc:'<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"/>',cal:'<path d="M4 6h16v15H4zM4 10h16M8 3v5M16 3v5"/>',car:'<path d="M4 16v-4l2-5h12l2 5v4zM4 16v2M20 16v2M4 12h16"/>',sofa:'<path d="M4 12V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M3 12a2 2 0 0 1 2 2v2h14v-2a2 2 0 0 1 2-2M6 16v2M18 16v2"/>',door:'<path d="M6 21V3h12v18M4 21h16M14 12h1"/>',chef:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10"/>',gem:'<path d="M6 4h12l4 5-10 12L2 9zM2 9h20M9 4l3 5 3-5"/>',auto:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',lift:'<path d="M5 3h14v18H5zM12 3v18M8 9l1.5-2L11 9M13 15l1.5 2 1.5-2"/>',bolt:'<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',gym:'<path d="M6 8v8M3 10v4M18 8v8M21 10v4M6 12h12"/>',arch:'<path d="M5 21V10a7 7 0 0 1 14 0v11M3 21h18M12 10v11"/>',tree:'<path d="M12 21v-6M12 3a5 5 0 0 0-4 8 4 4 0 0 0 4 4 4 4 0 0 0 4-4 5 5 0 0 0-4-8z"/>',shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',mail:'<path d="M3 5h18v14H3zM3 6l9 7 9-7"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',pin:'<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',users:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 2.8-6 6.5-6s6.5 2.5 6.5 6M15.5 8.2a3 3 0 1 1 .3-6M17 14c2.7.5 4.5 2.6 4.5 6"/>',floor:'<path d="M4 21h16M4 16h16M4 11h16M9 6h6v5H9z"/>'};
+const IC=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" style="stroke:var(--gold)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
+const T=(r,x)=>`<div class="t" data-r="${r}">${x}</div>`;
+const IT=(i,h,b)=>`<div class="it">${IC(i)}<div>${T('ih',h)}${T('ib',b)}</div></div>`;
+const IMG=(g,st='')=>`<div class="img ${g}" style="${st}"><span class="ph noexp">Double-click to add an image</span></div>`;
+const lock=()=>`<div class="lock"><div class="img logo"></div><div>${T('brand','The Avenue')}${T('sub','Residences · Old Ikoyi')}</div></div>`;
+const sh2=(k,h)=>`<div class="sh2">${T('kick',k)}${T('h2',h)}</div>`;
+const specs=[['plan','Footprint','466 sqm single-level lateral layout'],['floor','Position','Elevated 6th floor'],['bed','Bedrooms','5: four en-suite plus one flexible room'],['desk','Workspace','1 dedicated executive home office'],['users','Staffing','2 en-suite service quarters (BQ)'],['doc','Title','C of O, 89-year unexpired residue'],['cal','Completion','Handover readiness Oct 2026 (Q4)'],['car','Parking','3 dedicated covered spaces']];
+const feat=[['sofa','Generous lateral living area','466 sqm of fluid, high-ceiling indoor living and entertainment zones designed for seamless hosting.'],['bed','5 residential bedrooms','4 primary en-suite bedrooms plus a versatile 5th bedroom or multi-purpose space, ideal for a private gym or guest room, with an adjacent box room pre-plumbed for en-suite conversion.'],['desk','Dedicated executive home office','A completely isolated workspace engineered for private working and corporate connectivity without sacrificing bedroom capacity.'],['door','Dual staff quarters','2 integrated en-suite domestic staff quarters (BQ) with independent service access.'],['chef',"Chef's kitchen",'Fully fitted, state-of-the-art kitchen featuring modern cabinetry and premium integrated appliances.'],['gem','Bespoke architectural finishes','Premium imported marble, granite and quartz tile finishes throughout the main living corridors.']];
+const smart=[['auto','Home automation','Fully integrated smart-home technology infrastructure governing lighting, climate and security access.'],['lift','Vertical mobility','Dual high-speed resident elevators complemented by a dedicated service elevator.'],['bolt','Uninterrupted utilities','24-hour guaranteed captive power generation, centralized water treatment and dedicated sewage treatment infrastructure.']];
+const amen=[['arch','Grand entrance','Exquisite entrance lobby featuring a contemporary resident lounge area.'],['gym','Wellness and recreation','Fully equipped fitness center, resort-style swimming pool and private games/billiards room.'],['tree','Landscaping and parking','Professionally landscaped grounds within a fully gated, perimeter-secured compound featuring 3 dedicated covered parking spaces.'],['shield','Comprehensive security','24-hour manned physical security, gated entry control, perimeter fencing and integrated CCTV surveillance.']];
+$('#stage').innerHTML=`
+<section class="pg" id="p1">${IMG('g0 bleed','height:330px')}
+ <div class="tab">${lock()}</div>
+ <div class="blk">${T('kick','Executive 5-bedroom residence & home office')}${T('h1','Refined lateral luxury in the heart of Old Ikoyi')}<i class="rule"></i><div class="loc">${IC('pin')}${T('dtag','Lugard Avenue, Old Ikoyi, Lagos')}</div></div>
+ <div class="pd">
+  <div class="hd"><div class="pr">${T('kick','Guide price')}${T('price','USD $1,900,000')}${T('note','or nearest offer')}</div>
+   <div><div class="sr">${T('stat','466')}${T('kick','Sqm of continuous single-level lateral floorplate')}</div>${T('body','Spanning an impressive 466 sqm continuous lateral floorplate on the 6th floor, this executive residence combines expansive spatial design with modern architectural sophistication. Located in one of Ikoyi’s most quiet and secure residential corridors, the home is engineered for discerning buyers seeking uncompromised privacy, smart automation, generous light-filled living spaces, and flexible room configurations.')}</div></div>
+  <div class="sp">${specs.map(s=>`<div>${IC(s[0])}<div>${T('k',s[1])}${T('v',s[2])}</div></div>`).join('')}</div>
+  <div class="sec"><div class="sh">${T('h2','Bespoke interior and spatial architecture')}${T('kick','6th floor, Lugard Avenue')}</div><div class="grid2">${feat.map(f=>IT(...f)).join('')}</div></div>
+ </div>${T('pn','The Avenue Residences, Old Ikoyi, Lagos')}</section>
+<section class="pg" id="p2"><div class="bar">${lock()}${T('sub','Infrastructure, amenities & personalization')}</div>
+ <div class="col3">${IMG('g1')}${IMG('g2')}${IMG('g0')}</div>
+ <div class="call"><div>${T('kick','Before handover, October 2026')}${T('ch','Bespoke personalization opportunity')}</div>${T('db','As the property approaches its October 2026 completion date, early acquisition offers purchasers the unique opportunity to introduce custom non-structural interior finishes, tailored lighting schemes, and material choices, including converting the 5th bedroom’s adjacent box room into a full en-suite bathroom, prior to final handover.')}</div>
+ <div class="cols"><div>${sh2('Systems','Smart living and environmental systems')}${smart.map(f=>IT(...f)).join('')}</div><div>${sh2('Amenities','Exclusive resident amenities')}${amen.map(f=>IT(...f)).join('')}</div></div>
+ <div class="cta dk"><div><div class="lock"><div class="img logo"></div><div>${T('brand','The Avenue')}${T('sub','Residences · Old Ikoyi')}</div></div>${T('dh','Sales advisory by [Your agency name]')}${T('db','Private viewings and confidential inquiries')}</div>
+  <div><div class="cr">${IC('phone')}${T('db','Phone / WhatsApp: +234 (0) XX XXXX XXXX')}</div><div class="cr">${IC('mail')}${T('db','info@yourfirm.com')}</div><div class="cr">${IC('globe')}${T('db','www.yourfirm.com')}</div></div></div>
+</section>`;
+
+/* editing */
+const CE=(()=>{const d=document.createElement('div');d.contentEditable='plaintext-only';return d.contentEditable==='plaintext-only'?'plaintext-only':'true'})();
+$$('.t').forEach(n=>{n.contentEditable=CE;n.spellcheck=false});
+document.addEventListener('paste',e=>{if(e.target.closest&&e.target.closest('.t')){e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))}});
+const hex=c=>'#'+c.match(/\d+/g).slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
+let cur=null;
+function sel(e){
+  cur&&cur.classList.remove('sel');cur=e;
+  if(!e){who.textContent='Click any text or image';gt.hidden=gi.hidden=true;return}
+  e.classList.add('sel');const im=e.classList.contains('img');gt.hidden=im;gi.hidden=!im;who.textContent=im?(e.classList.contains('logo')?'Logo':'Image'):'Text';
+  if(im){const p=(e.style.backgroundPosition||'50% 50%').split(' ');px.value=parseFloat(p[0]);py.value=parseFloat(p[1])}
+  else{const s=getComputedStyle(e),f=s.fontFamily.split(',')[0].replace(/['"]/g,'').trim();fs.value=Math.round(parseFloat(s.fontSize)*2)/2;fc.value=hex(s.color);fw.value=s.fontWeight;ff.value=[...ff.options].some(o=>o.value===f||o.text===f)?f:''}
+}
+document.addEventListener('click',e=>{if(e.target===fi)return;const t=e.target.closest('.t,.img');if(t)sel(t);else if(!e.target.closest('.tb'))sel(null)});
+document.addEventListener('dblclick',e=>{const t=e.target.closest('.img');if(t){sel(t);fi.click()}});
+const ap=(p,v)=>{if(!cur)return;(all.checked&&cur.dataset.r?$$('[data-r="'+cur.dataset.r+'"]'):[cur]).forEach(n=>n.style[p]=v)};
+ff.onchange=()=>ff.value&&ap('fontFamily',STACK[ff.value]||`'${ff.value}',sans-serif`);
+const setVar=(k,v)=>document.documentElement.style.setProperty(k,v);
+cnavy.oninput=()=>setVar('--navy',cnavy.value);
+cgold.oninput=()=>setVar('--gold',cgold.value);
+cpaper.oninput=()=>setVar('--paper',cpaper.value);
+fs.oninput=()=>fs.value&&ap('fontSize',fs.value+'px');
+fc.oninput=()=>ap('color',fc.value);
+$$('.sw').forEach(s=>s.onclick=()=>{fc.value=s.dataset.c;ap('color',s.dataset.c)});
+fw.onchange=()=>ap('fontWeight',fw.value);
+up.onclick=()=>fi.click();
+rm.onclick=()=>{if(cur){cur.style.backgroundImage='';cur.classList.remove('has')}};
+px.oninput=py.oninput=()=>{if(cur)cur.style.backgroundPosition=px.value+'% '+py.value+'%'};
+fi.onchange=()=>{
+  const f=fi.files[0],t=cur;fi.value='';if(!f||!t||!t.classList.contains('img'))return;
+  const lg=t.classList.contains('logo'),r=new FileReader();
+  r.onload=()=>{const i=new Image();i.onload=()=>{
+    const k=Math.min(1,2400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;
+    c.getContext('2d').drawImage(i,0,0,c.width,c.height);
+    t.style.backgroundImage='url('+(lg?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.92))+')';t.classList.add('has')};i.src=r.result};r.readAsDataURL(f)};
+
+/* fit to screen */
+const fit=()=>{$('#stage').style.zoom=Math.min(1,(innerWidth-16)/794)};
+addEventListener('resize',fit);fit();
+
+/* export */
+const msg=s=>st.textContent=s;
+async function ready(){sel(null);document.activeElement&&document.activeElement.blur();scrollTo(0,0);document.body.classList.add('exp');$('#stage').style.zoom=1;await document.fonts.ready}
+const shot=p=>html2canvas(p,{scale:2,backgroundColor:'#fff',ignoreElements:e=>e.classList&&e.classList.contains('noexp')});
+const blobOf=(c,t,q)=>new Promise(r=>c.toBlob(r,t,q));
+function inl(o,c){const s=getComputedStyle(o);let t='';for(const k of s){if(k[0]==='-'||/^(animation|transition|scroll|view)/.test(k))continue;t+=k+':'+s.getPropertyValue(k)+';'}c.setAttribute('style',t);c.removeAttribute('contenteditable');[...o.children].forEach((x,i)=>inl(x,c.children[i]))}
+function svgOf(p){const c=p.cloneNode(true);inl(p,c);$$('.noexp',c).forEach(n=>n.remove());
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 794 1123"><style>@import url(${FONTS.replace(/&/g,'&amp;')});</style><foreignObject width="794" height="1123">${new XMLSerializer().serializeToString(c)}</foreignObject></svg>`}
+async function save(name,data){
+  const d=window.claude&&await claude.use('downloads');
+  if(d)await d.save({filename:name,data});
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(data);a.download=name;a.click()}
+}
+async function run(kind){
+  try{
+    await ready();const P=$$('.pg');
+    if(kind==='pdf'){
+      msg('Rendering PDF…');const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+      for(let i=0;i<P.length;i++){const c=await shot(P[i]);if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,210,297)}
+      await save(NAME+'.pdf',pdf.output('blob'));
+    }else for(let i=0;i<P.length;i++){
+      msg('Page '+(i+1)+'…');
+      const b=kind==='jpg'?await blobOf(await shot(P[i]),'image/jpeg',.94):new Blob([svgOf(P[i])],{type:'image/svg+xml'});
+      await save(NAME+'-page-'+(i+1)+'.'+kind,b);
+    }
+    msg('Done');
+  }catch(e){msg(e&&e.code==='declined'?'Save cancelled':'Export failed: '+((e&&(e.code||e.message))||e))}
+  finally{document.body.classList.remove('exp');fit()}
+}
+bp.onclick=()=>run('pdf');bj.onclick=()=>run('jpg');bs.onclick=()=>run('svg');
+</script>
+</body>
+</html>
