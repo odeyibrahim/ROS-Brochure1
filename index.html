@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
 .g0{background-image:linear-gradient(135deg,#1c2f52,#4a6284)}.g1{background-image:linear-gradient(160deg,#d3cab8,#988b73)}.g2{background-image:linear-gradient(120deg,#8497b0,#34486a)}
 .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:12px system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px #0006;pointer-events:none}
 .has .ph{display:none}
-.logo{width:42px;height:42px;flex:none;background-color:#fff;border-radius:8px;background-size:62% auto;background-repeat:no-repeat;background-position:50% 50%;box-shadow:0 0 0 1px #0000000d;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23B08D4A' stroke-width='1.6'%3E%3Crect x='1' y='1' width='38' height='38'/%3E%3Cpath d='M11 30L20 9l9 21M14.5 23h11'/%3E%3C/svg%3E")}
+.logo{width:42px;height:42px;flex:none;background-color:#fff;border-radius:8px;background-size:contain;background-origin:content-box;padding:5px;background-repeat:no-repeat;background-position:50% 50%;box-shadow:0 0 0 1px #0000000d;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23B08D4A' stroke-width='1.6'%3E%3Crect x='1' y='1' width='38' height='38'/%3E%3Cpath d='M11 30L20 9l9 21M14.5 23h11'/%3E%3C/svg%3E")}
 .lock{display:flex;align-items:center;gap:12px}
 .ic{width:22px;height:22px;flex:none}
 [data-r=brand]{font-size:13px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;line-height:1.3}
@@ -56,7 +56,7 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
 .tab{position:absolute;left:0;top:0;padding:20px 32px 20px 48px}
 .tab [data-r=brand]{color:#fff;text-shadow:0 2px 10px #00000080}
 .tab [data-r=sub]{color:#f3dfb0;text-shadow:0 1px 6px #00000080}
-.tab .logo{width:64px;height:64px;background-size:74% auto}
+.tab .logo{width:64px;height:64px}
 .blk{position:absolute;left:48px;top:250px;width:330px;height:216px;background:var(--navy);padding:26px 28px;z-index:2}
 .rule{display:block;width:30px;height:1.5px;background:var(--gold);margin-bottom:14px}
 .loc{display:flex;align-items:center;gap:8px}.loc .ic{width:16px;height:16px}
@@ -94,8 +94,9 @@ body{background:var(--bg);color:var(--fg);font:14px 'Hanken Grotesk',system-ui,s
   </span>
   <span class="grp" id="gi" hidden>
     <button id="up">Replace image</button><button id="rm">Remove</button>
-    <label>Focus X <input type="range" id="px" min="0" max="100"></label>
-    <label>Y <input type="range" id="py" min="0" max="100"></label>
+    <span id="gilg" hidden><label>Logo size <input type="range" id="lsz" min="28" max="160" step="1"></label></span>
+    <span id="gifoc"><label>Focus X <input type="range" id="px" min="0" max="100"></label>
+    <label>Y <input type="range" id="py" min="0" max="100"></label></span>
   </span>
   <span class="grp" id="gd" title="Page palette — applies to all pages">
     <label>Navy <input type="color" id="cnavy" value="#0f1f3d"></label>
@@ -122,6 +123,7 @@ const T=(r,x)=>`<div class="t" data-r="${r}">${x}</div>`;
 const IT=(i,h,b)=>`<div class="it">${IC(i)}<div>${T('ih',h)}${T('ib',b)}</div></div>`;
 const IMG=(g,st='')=>`<div class="img ${g}" style="${st}"><span class="ph noexp">Double-click to add an image</span></div>`;
 const lock=()=>`<div class="lock"><div class="img logo"></div><div>${T('brand','The Avenue')}${T('sub','Residences · Old Ikoyi')}</div></div>`;
+const brandOnly=()=>`<div>${T('brand','The Avenue')}${T('sub','Residences · Old Ikoyi')}</div>`;
 const sh2=(k,h)=>`<div class="sh2">${T('kick',k)}${T('h2',h)}</div>`;
 const specs=[['plan','Footprint','466 sqm single-level lateral layout'],['floor','Position','Elevated 6th floor'],['bed','Bedrooms','5: four en-suite plus one flexible room'],['desk','Workspace','1 dedicated executive home office'],['users','Staffing','2 en-suite service quarters (BQ)'],['doc','Title','C of O, 89-year unexpired residue'],['cal','Completion','Handover readiness Oct 2026 (Q4)'],['car','Parking','3 dedicated covered spaces']];
 const feat=[['sofa','Generous lateral living area','466 sqm of fluid, high-ceiling indoor living and entertainment zones designed for seamless hosting.'],['bed','5 residential bedrooms','4 primary en-suite bedrooms plus a versatile 5th bedroom or multi-purpose space, ideal for a private gym or guest room, with an adjacent box room pre-plumbed for en-suite conversion.'],['desk','Dedicated executive home office','A completely isolated workspace engineered for private working and corporate connectivity without sacrificing bedroom capacity.'],['door','Dual staff quarters','2 integrated en-suite domestic staff quarters (BQ) with independent service access.'],['chef',"Chef's kitchen",'Fully fitted, state-of-the-art kitchen featuring modern cabinetry and premium integrated appliances.'],['gem','Bespoke architectural finishes','Premium imported marble, granite and quartz tile finishes throughout the main living corridors.']];
@@ -137,7 +139,7 @@ $('#stage').innerHTML=`
   <div class="sp">${specs.map(s=>`<div>${IC(s[0])}<div>${T('k',s[1])}${T('v',s[2])}</div></div>`).join('')}</div>
   <div class="sec"><div class="sh">${T('h2','Bespoke interior and spatial architecture')}${T('kick','6th floor, Lugard Avenue')}</div><div class="grid2">${feat.map(f=>IT(...f)).join('')}</div></div>
  </div>${T('pn','The Avenue Residences, Old Ikoyi, Lagos')}</section>
-<section class="pg" id="p2"><div class="bar">${lock()}${T('sub','Infrastructure, amenities & personalization')}</div>
+<section class="pg" id="p2"><div class="bar">${brandOnly()}${T('sub','Infrastructure, amenities & personalization')}</div>
  <div class="col3">${IMG('g1')}${IMG('g2')}${IMG('g0')}</div>
  <div class="call"><div>${T('kick','Before handover, October 2026')}${T('ch','Bespoke personalization opportunity')}</div>${T('db','As the property approaches its October 2026 completion date, early acquisition offers purchasers the unique opportunity to introduce custom non-structural interior finishes, tailored lighting schemes, and material choices, including converting the 5th bedroom’s adjacent box room into a full en-suite bathroom, prior to final handover.')}</div>
  <div class="cols"><div>${sh2('Systems','Smart living and environmental systems')}${smart.map(f=>IT(...f)).join('')}</div><div>${sh2('Amenities','Exclusive resident amenities')}${amen.map(f=>IT(...f)).join('')}</div></div>
@@ -154,8 +156,12 @@ let cur=null;
 function sel(e){
   cur&&cur.classList.remove('sel');cur=e;
   if(!e){who.textContent='Click any text or image';gt.hidden=gi.hidden=true;return}
-  e.classList.add('sel');const im=e.classList.contains('img');gt.hidden=im;gi.hidden=!im;who.textContent=im?(e.classList.contains('logo')?'Logo':'Image'):'Text';
-  if(im){const p=(e.style.backgroundPosition||'50% 50%').split(' ');px.value=parseFloat(p[0]);py.value=parseFloat(p[1])}
+  e.classList.add('sel');const im=e.classList.contains('img');gt.hidden=im;gi.hidden=!im;const isLogo=e.classList.contains('logo');who.textContent=im?(isLogo?'Logo':'Image'):'Text';
+  if(im){
+    gilg.hidden=!isLogo;gifoc.hidden=isLogo;
+    if(isLogo){const w=parseFloat(getComputedStyle(e).width);lsz.value=Math.round(w)}
+    else{const p=(e.style.backgroundPosition||'50% 50%').split(' ');px.value=parseFloat(p[0]);py.value=parseFloat(p[1])}
+  }
   else{const s=getComputedStyle(e),f=s.fontFamily.split(',')[0].replace(/['"]/g,'').trim();fs.value=Math.round(parseFloat(s.fontSize)*2)/2;fc.value=hex(s.color);fw.value=s.fontWeight;ff.value=[...ff.options].some(o=>o.value===f||o.text===f)?f:''}
 }
 document.addEventListener('click',e=>{if(e.target===fi)return;const t=e.target.closest('.t,.img');if(t)sel(t);else if(!e.target.closest('.tb'))sel(null)});
@@ -173,6 +179,7 @@ fw.onchange=()=>ap('fontWeight',fw.value);
 up.onclick=()=>fi.click();
 rm.onclick=()=>{if(cur){cur.style.backgroundImage='';cur.classList.remove('has')}};
 px.oninput=py.oninput=()=>{if(cur)cur.style.backgroundPosition=px.value+'% '+py.value+'%'};
+lsz.oninput=()=>{if(cur){cur.style.width=cur.style.height=lsz.value+'px'}};
 fi.onchange=()=>{
   const f=fi.files[0],t=cur;fi.value='';if(!f||!t||!t.classList.contains('img'))return;
   const lg=t.classList.contains('logo'),r=new FileReader();
